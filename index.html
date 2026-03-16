@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blackjack Pro - Hi-Opt II Multi-Player</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; color: #fff; margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .main-wrapper { display: flex; gap: 20px; max-width: 1200px; width: 100%; flex-wrap: wrap; justify-content: center; }
+        .inst-panel { width: 100%; max-width: 250px; background: #2c2c2c; padding: 15px; border-radius: 12px; border: 1px solid #444; }
+        .container { background-color: #2c2c2c; padding: 15px; border-radius: 12px; flex: 2; min-width: 300px; }
+        .side-panel { width: 100%; max-width: 300px; }
+        .player-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; }
+        .player-label { width: 50px; font-weight: bold; color: #f1c40f; font-size: 0.9em; }
+        input, select { padding: 10px; border-radius: 4px; border: 1px solid #444; background: #1a1a1a; color: white; flex: 1; font-size: 16px; }
+        .stat-box { background: #3d3d3d; padding: 15px; border-radius: 8px; margin-bottom: 10px; text-align: center; }
+        .thermo-bar { height: 20px; background: #222; border-radius: 10px; overflow: hidden; display: flex; margin-top: 10px; }
+        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; margin-top: 5px; font-size: 14px; }
+        .history-panel { background: #2c2c2c; border: 1px solid #444; height: 120px; overflow-y: auto; padding: 10px; font-size: 0.8em; }
+        @media (max-width: 768px) { .main-wrapper { flex-direction: column; align-items: center; } .inst-panel, .container, .side-panel { width: 100%; max-width: 100%; box-sizing: border-box; } }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="inst-panel">
+        <h3>Hi-Opt II Values</h3>
+        <p style="font-size: 0.8em;">2, 3, 6, 7: <b>+1</b> | 4, 5: <b>+2</b><br>8, 9, A: <b>0</b> | 10, J, Q, K: <b>-2</b></p>
+        <hr style="border:0; border-top:1px solid #444">
+        
+        <h4>Decks in Shoe</h4>
+        <select id="numDecks" onchange="resetDeck()">
+            <option value="1">1 Deck</option>
+            <option value="4">4 Decks</option>
+            <option value="6">6 Decks</option>
+            <option value="8" selected>8 Decks</option>
+        </select>
+
+        <h4>Betting Manager (P1)</h4>
+        Base Bet: <input type="number" id="baseBet" value="10.00" step="0.01" oninput="updateDashboard()">
+        <p>Next Bet: <b id="nextBet" style="color:#27ae60; font-size: 1.2em;">$10.00</b></p>
+        
+        <hr style="border:0; border-top:1px solid #444; margin: 15px 0;">
+        <a href="https://www.paypal.com/donate/?hosted_button_id=YOUR_BUTTON_ID" target="_blank" style="text-decoration: none;">
+            <button style="background-color: #f39c12; width: 100%; border: none; padding: 10px; border-radius: 6px; font-weight: bold; color: #1a1a1a;">
+                ☕ Buy me a coffee
+            </button>
+        </a>
+    </div>
+
+    <div class="container">
+        <h2>Table</h2>
+        <div id="playerList" style="margin-top:10px;">
+            <div class="player-row"><span class="player-label">Dealer</span> <input type="text" id="dealerHand" placeholder="Cards"></div>
+            <div class="player-row"><span class="player-label">P1</span> <input type="text" id="p1Hand" class="p-input" placeholder="Cards"> <button onclick="getAdvice('p1Hand')" style="background:#e67e22">?</button></div>
+        </div>
+        <button onclick="addPlayer()" style="background:#3498db; width:100%">+ ADD PLAYER</button>
+        <button onclick="logRound()" style="background:#27ae60; width:100%">LOG ROUND</button>
+        <button onclick="resetDeck()" style="background:#444; width:100%">RESET SHOE</button>
+    </div>
+
+    <div class="side-panel">
+        <div class="stat-box">
+            <div>RC: <span id="countVal">0</span> | TC: <span id="trueCountVal" style="color:#f1c40f;">0</span></div>
+            <div style="margin: 5px 0;">10s Remaining: <span id="tensRemaining" style="color:#e74c3c;">0</span></div>
+            <div class="thermo-bar"><div id="thermo" style="width: 50%; height: 100%; background: #7f8c8d; transition: all 0.3s;"></div></div>
+        </div>
+        <div class="stat-box">
+            <div>P1 BANKROLL: <span id="bankroll" style="color:#3498db;">$0.00</span></div>
+            <div>INSURANCE (TC ≥ 3): <span id="insResult">NO</span></div>
+        </div>
+        <div class="history-panel" id="historyList"><b>History</b></div>
+    </div>
+</div>
+
+<script>
+    const strategy = { values: { '2': 1, '3': 1, '4': 2, '5': 2, '6': 1, '7': 1, '8': 0, '9': 0, '10': -2, 'j': -2, 'q': -2, 'k': -2, 'a': 0 } };
+    let pCount = 1, runningCount = 0, totalCards = 8 * 52, cardsDealt = 0, tensDealt = 0, lossStreak = 0, profit = 0;
+
+    document.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter' && e.target.classList.contains('p-input')) {
+            getAdvice(e.target.id);
+        }
+    });
+
+    function addPlayer() {
+        if (pCount >= 8) return;
+        pCount++;
+        const div = document.createElement('div');
+        div.className = 'player-row';
+        div.innerHTML = `<span class="player-label">P${pCount}</span> <input type="text" id="p${pCount}Hand" class="p-input" placeholder="Cards"> <button onclick="getAdvice('p${pCount}Hand')" style="background:#e67e22">?</button>`;
+        document.getElementById('playerList').appendChild(div);
+    }
+
+    function getAdvice(id) {
+        const h = document.getElementById(id).value.toLowerCase().split(' ');
+        let t = h.reduce((s, c) => s + (parseInt(c) || (['j','q','k'].includes(c)?10: (c==='a'?11:0))), 0);
+        alert("P" + id.replace('p','').replace('Hand','') + " Total: " + t + " -> " + (t > 21 ? "BUST" : (t >= 17 ? "STAND" : "HIT")));
+    }
+
+    function logRound() {
+        const dIn = document.getElementById('dealerHand'), p1In = document.getElementById('p1Hand');
+        const calcTotal = (c) => c.reduce((s, x) => s + (parseInt(x) || (['j','q','k'].includes(x)?10: (x==='a'?11:0))), 0);
+        const dTot = calcTotal(dIn.value.toLowerCase().split(' ')), p1Tot = calcTotal(p1In.value.toLowerCase().split(' '));
+        const currentBet = parseFloat(document.getElementById('baseBet').value) * Math.pow(2, lossStreak);
+        let p1Status = (p1Tot > 21) ? "BUST" : (dTot > 21) ? "WIN" : (p1Tot > dTot) ? "WIN" : (p1Tot < dTot) ? "LOSS" : "PUSH";
+        if(p1Status === "LOSS" || p1Status === "BUST") { profit -= currentBet; lossStreak++; }
+        else if(p1Status === "WIN") { profit += currentBet; lossStreak = 0; }
+        [dIn, ...document.querySelectorAll('.p-input')].forEach(inp => {
+            inp.value.toLowerCase().split(' ').forEach(card => {
+                if (['10', 'j', 'q', 'k'].includes(card)) { tensDealt++; }
+                if(strategy.values.hasOwnProperty(card)) { runningCount += strategy.values[card]; cardsDealt++; }
+            });
+            inp.value = "";
+        });
+        updateDashboard();
+        document.getElementById('historyList').innerHTML += `<div>TC: ${Math.round(runningCount / Math.max(0.5, (totalCards-cardsDealt)/52))} P1:${p1Status}</div>`;
+    }
+
+    function updateDashboard() {
+        const decks = parseInt(document.getElementById('numDecks').value);
+        let tc = runningCount / Math.max(0.5, (totalCards - cardsDealt) / 52);
+        document.getElementById('countVal').innerText = runningCount;
+        document.getElementById('trueCountVal').innerText = tc.toFixed(1);
+        document.getElementById('tensRemaining').innerText = (decks * 16 - tensDealt);
+        document.getElementById('bankroll').innerText = "$" + profit.toFixed(2);
+        document.getElementById('nextBet').innerText = "$" + (parseFloat(document.getElementById('baseBet').value) * Math.pow(2, lossStreak)).toFixed(2);
+        document.getElementById('thermo').style.width = Math.min(100, Math.max(0, ((tc + 5) / 10) * 100)) + "%";
+        document.getElementById('insResult').innerText = tc >= 3 ? "YES" : "NO";
+    }
+
+    function resetDeck() {
+        const decks = parseInt(document.getElementById('numDecks').value);
+        totalCards = decks * 52;
+        cardsDealt = 0; tensDealt = 0; runningCount = 0; lossStreak = 0; profit = 0;
+        updateDashboard();
+        document.getElementById('historyList').innerHTML = "<b>History</b>";
+    }
+    resetDeck();
+</script>
+</body>
+</html>
