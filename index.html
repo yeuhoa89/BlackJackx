@@ -3,53 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>H4ppyAsian Blackjack Pro - v1.8 Beta</title>
+    <title>H4ppyAsian Blackjack Pro - V1.9</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; color: #fff; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .main-wrapper { display: flex; gap: 20px; max-width: 1200px; width: 100%; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
-        .inst-panel { width: 100%; max-width: 250px; background: #2c2c2c; padding: 15px; border-radius: 12px; border: 1px solid #444; }
+        .main-wrapper { display: flex; gap: 20px; max-width: 1400px; width: 100%; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+        .inst-panel { width: 100%; max-width: 280px; background: #2c2c2c; padding: 15px; border-radius: 12px; border: 1px solid #444; }
         .container { background-color: #2c2c2c; padding: 15px; border-radius: 12px; flex: 2; min-width: 300px; }
-        .side-panel { width: 100%; max-width: 300px; }
+        .side-panel { width: 100%; max-width: 320px; }
         .guide-panel { width: 100%; max-width: 900px; background: #2c2c2c; padding: 20px; border-radius: 12px; border: 1px solid #444; }
         .player-row { display: flex; gap: 10px; margin-bottom: 4px; align-items: center; flex-wrap: wrap; }
         .player-label { width: 50px; font-weight: bold; color: #f1c40f; font-size: 0.9em; }
         input, select { padding: 10px; border-radius: 4px; border: 1px solid #444; background: #1a1a1a; color: white; flex: 1; font-size: 16px; min-width: 120px; }
-        .stat-box { background: #3d3d3d; padding: 15px; border-radius: 8px; margin-bottom: 10px; text-align: center; }
-        .bust-box { background: #2c3e50; padding: 15px; border-radius: 8px; margin-bottom: 10px; text-align: center; border: 2px solid #e67e22; }
-        .double-box { background: #1e3d2f; padding: 15px; border-radius: 8px; margin-bottom: 10px; text-align: center; border: 2px solid #27ae60; }
-        /* NEW: Insurance Box Styles */
-        .insurance-box { 
-            background: #2c2c2c; 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin-bottom: 10px; 
-            text-align: center; 
-            border: 2px solid #7f8c8d;
-            transition: border-color 0.3s;
-        }
+        .stat-box { background: #3d3d3d; padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: center; font-size: 0.9em; }
+        
+        .bust-box { background: #2c3e50; padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: center; border: 2px solid #e67e22; }
+        .bust-simple { font-size: 1.2em; font-weight: bold; margin: 8px 0; }
+        .bust-likely { color: #27ae60; }
+        .bust-unlikely { color: #e74c3c; }
+        
+        .double-box { background: #1e3d2f; padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: center; border: 2px solid #27ae60; }
+        .double-box.waiting { border-color: #7f8c8d; background: #2c2c2c; }
+        .insurance-box { background: #2c2c2c; padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: center; border: 2px solid #7f8c8d; }
         .insurance-box.active-yes { border-color: #27ae60; background: #1e3d2f; }
         .insurance-box.active-no { border-color: #e74c3c; background: #3d1f1f; }
-        .insurance-box.waiting { border-color: #7f8c8d; }
+        .hit-prob-box { background: #2c2c2c; padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: center; border: 2px solid #9b59b6; }
         
-        .insurance-label { font-size: 0.85em; color: #bdc3c7; margin-bottom: 5px; }
-        .insurance-status { font-size: 1.4em; font-weight: bold; margin: 8px 0; }
-        .insurance-yes { color: #27ae60; text-shadow: 0 0 10px #27ae60; }
-        .insurance-no { color: #e74c3c; }
-        .insurance-na { color: #7f8c8d; font-size: 1.1em; }
-        .insurance-detail { font-size: 0.75em; color: #95a5a6; margin-top: 5px; }
+        .hand-counter { 
+            background: #34495e; 
+            padding: 8px; 
+            border-radius: 6px; 
+            margin-bottom: 10px; 
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #7f8c8d;
+        }
+        .hand-counter .count { color: #f1c40f; font-size: 1.2em; }
         
-        .bust-high { color: #27ae60; font-weight: bold; font-size: 1.3em; }
-        .bust-low { color: #e74c3c; font-weight: bold; font-size: 1.3em; }
-        .bust-med { color: #f1c40f; font-weight: bold; font-size: 1.3em; }
-        .double-yes { color: #27ae60; font-weight: bold; font-size: 1.5em; text-shadow: 0 0 10px #27ae60; }
-        .double-no { color: #e74c3c; font-weight: bold; font-size: 1.5em; }
-        .double-maybe { color: #f1c40f; font-weight: bold; font-size: 1.3em; }
-        .thermo-bar { height: 20px; background: #222; border-radius: 10px; overflow: hidden; display: flex; margin-top: 10px; }
+        .insurance-yes { color: #27ae60; font-weight: bold; font-size: 1.4em; text-shadow: 0 0 10px #27ae60; }
+        .insurance-no { color: #e74c3c; font-weight: bold; font-size: 1.4em; }
+        .insurance-wait { color: #7f8c8d; font-weight: bold; font-size: 1.1em; }
+        .double-yes { color: #27ae60; font-weight: bold; font-size: 1.4em; text-shadow: 0 0 10px #27ae60; }
+        .double-no { color: #e74c3c; font-weight: bold; font-size: 1.4em; }
+        .double-wait { color: #7f8c8d; font-size: 1.1em; }
+        
+        .prob-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.8em; margin-top: 8px; text-align: left; }
+        .prob-item { background: #1a1a1a; padding: 4px 8px; border-radius: 4px; display: flex; justify-content: space-between; }
+        .prob-good { color: #27ae60; font-weight: bold; }
+        .prob-bad { color: #e74c3c; font-weight: bold; }
+        .prob-neutral { color: #f1c40f; }
+        
+        .thermo-bar { height: 20px; background: #222; border-radius: 10px; overflow: hidden; display: flex; margin-top: 8px; }
         button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; margin-top: 5px; font-size: 14px; }
         .history-panel { background: #2c2c2c; border: 1px solid #444; height: 120px; overflow-y: auto; padding: 10px; font-size: 0.8em; }
-        h3, h4 { margin-top: 0; }
-        ul { padding-left: 20px; }
-        li { margin-bottom: 5px; }
+        h3, h4 { margin-top: 0; font-size: 0.95em; }
+        .live-indicator { color: #e67e22; font-weight: bold; }
         
         .advice-text { 
             width: 100%; 
@@ -66,22 +73,16 @@
         .advice-hit { background: #e74c3c; color: white; }
         .advice-stand { background: #27ae60; color: white; }
         .advice-double { background: #f39c12; color: black; }
-        .advice-split { background: #9b59b6; color: white; }
         .advice-wait { background: #34495e; color: #bdc3c7; }
-        .advice-bust { background: #c0392b; color: white; font-size: 1em; }
-        .advice-blackjack { background: #f1c40f; color: black; }
+        .advice-bust { background: #c0392b; color: white; }
         .dealer-total { background: #2980b9; color: white; }
-        .live-indicator { color: #e67e22; font-weight: bold; }
-        .committed-indicator { color: #7f8c8d; font-size: 0.75em; font-weight: normal; }
-        .tens-density { font-size: 0.75em; color: #95a5a6; margin-top: 3px; }
-        .prob-detail { font-size: 0.75em; color: #95a5a6; margin-top: 5px; }
         
         @media (max-width: 768px) { 
             .main-wrapper { flex-direction: column; align-items: center; } 
-            .inst-panel, .container, .side-panel, .guide-panel { width: 100%; max-width: 100%; box-sizing: border-box; } 
-            .advice-text { margin-left: 0; margin-top: 5px; }
+            .inst-panel, .container, .side-panel, .guide-panel { width: 100%; max-width: 100%; } 
+            .advice-text { margin-left: 0; }
             .player-row { flex-direction: column; align-items: stretch; }
-            .player-label { width: auto; margin-bottom: 5px; }
+            .player-label { width: auto; }
         }
     </style>
 </head>
@@ -89,11 +90,15 @@
 
 <div class="main-wrapper">
     <div class="inst-panel">
-        <h3>Hi-Opt II Values</h3>
-        <p style="font-size: 0.8em;">2, 3, 6, 7: <b>+1</b> | 4, 5: <b>+2</b><br>8, 9, A: <b>0</b> | 10, J, Q, K: <b>-2</b></p>
-        <hr style="border:0; border-top:1px solid #444">
+        <h3>Custom Values</h3>
+        <div style="font-size: 0.75em; line-height: 1.6; margin-bottom: 10px;">
+            2:+3 | 3:+2.5 | 4:+2 | 5:+1.5<br>
+            6:+1 | 7:0 | 8:-1 | 9:-1.5<br>
+            10:-2 | J:-2.5 | Q:-3 | K:-3.5 | A:0
+        </div>
+        <hr style="border:0; border-top:1px solid #444; margin: 10px 0;">
         
-        <h4>Decks in Shoe</h4>
+        <h4>Decks</h4>
         <select id="numDecks" onchange="resetDeck()">
             <option value="1">1 Deck</option>
             <option value="4">4 Decks</option>
@@ -101,117 +106,115 @@
             <option value="8" selected>8 Decks</option>
         </select>
 
-        <h4>Betting Manager (P1)</h4>
-        Base Bet: <input type="number" id="baseBet" value="10.00" step="0.01" oninput="updateDashboardBankroll()">
-        <p>Next Bet: <b id="nextBet" style="color:#27ae60; font-size: 1.2em;">$10.00</b></p>
-        
-        <hr style="border:0; border-top:1px solid #444; margin: 15px 0;">
-        <a href="https://www.paypal.com/donate?business=saftblandar@gmail.com&currency_code=USD" target="_blank" style="text-decoration: none;">
-            <button style="background-color: #f39c12; width: 100%; border: none; padding: 10px; border-radius: 6px; font-weight: bold; color: #1a1a1a;">
-                ☕ Buy me a coffee
-            </button>
-        </a>
+        <h4>Base Bet</h4>
+        <input type="number" id="baseBet" value="10.00" step="0.01" oninput="updateDashboardBankroll()">
+        <p>Next: <b id="nextBet" style="color:#27ae60; font-size: 1.2em;">$10.00</b></p>
     </div>
 
     <div class="container">
-        <h2>Table <span style="font-size:0.6em; color:#e67e22; font-weight:normal">(LIVE PREVIEW)</span></h2>
+        <h2>Table <span style="font-size:0.6em; color:#e67e22;">(HAND-AWARE)</span></h2>
         <div id="playerList" style="margin-top:10px;">
             <div class="player-row">
                 <span class="player-label">Dealer</span> 
-                <input type="text" id="dealerHand" placeholder="Upcard first (A for insurance check)" oninput="updateDealerDisplay()">
+                <input type="text" id="dealerHand" placeholder="Upcard" oninput="updateDealerDisplay()">
             </div>
-            <div class="advice-text dealer-total" id="dealer-info">Enter dealer upcard (e.g., 6 or A)</div>
+            <div class="advice-text dealer-total" id="dealer-info">Enter dealer upcard</div>
             
             <div class="player-row">
                 <span class="player-label">P1</span> 
                 <input type="text" id="p1Hand" class="p-input" placeholder="Your cards" oninput="updateAdvice('p1Hand')">
             </div>
-            <div class="advice-text advice-wait" id="p1-advice">Waiting for dealer upcard...</div>
+            <div class="advice-text advice-wait" id="p1-advice">Waiting...</div>
         </div>
         <button onclick="addPlayer()" style="background:#3498db; width:100%; margin-top: 15px;">+ ADD PLAYER</button>
-        <button onclick="logRound()" style="background:#27ae60; width:100%">LOG ROUND (Commit Count)</button>
-        <button onclick="resetDeck()" style="background:#444; width:100%">RESET SHOE</button>
+        <button onclick="logRound()" style="background:#27ae60; width:100%">LOG ROUND</button>
+        <button onclick="resetDeck()" style="background:#444; width:100%">RESET</button>
     </div>
 
     <div class="side-panel">
+        <div class="hand-counter">
+            <div style="font-size: 0.8em; color: #bdc3c7;">HANDS PLAYED</div>
+            <div class="count" id="handCount">0</div>
+            <div style="font-size: 0.7em; color: #95a5a6; margin-top: 2px;">Need +4 for Double, +6 for Insurance</div>
+        </div>
+
         <div class="stat-box" style="border: 1px solid #e67e22;">
-            <div style="font-size: 0.8em; color: #e67e22; margin-bottom: 5px; font-weight: bold;">⚡ LIVE PREVIEW (Type to update)</div>
-            <div>RC: <span id="countVal" class="live-indicator">0</span> <span id="countCommitted" class="committed-indicator" style="display:none;">(0)</span></div>
-            <div style="margin-top: 4px;">TC: <span id="trueCountVal" class="live-indicator" style="color:#f1c40f;">0</span> <span id="tcCommitted" class="committed-indicator" style="display:none; color:#7f8c8d;">(0)</span></div>
-            <div style="margin: 8px 0; border-top: 1px solid #555; padding-top: 8px;">
-                10s Remaining: <span id="tensRemaining" class="live-indicator" style="color:#e74c3c;">0</span> <span id="tensCommitted" class="committed-indicator" style="display:none; color:#7f8c8d;">(0)</span>
-                <div class="tens-density">Density: <span id="tensDensity">--</span>%</div>
-            </div>
+            <div style="font-size: 0.8em; color: #e67e22; margin-bottom: 5px; font-weight: bold;">⚡ LIVE COUNT</div>
+            <div>RC: <span id="countVal" class="live-indicator">0</span></div>
+            <div style="margin-top: 4px;">TC: <span id="trueCountVal" class="live-indicator" style="color:#f1c40f;">0</span></div>
             <div class="thermo-bar"><div id="thermo" style="width: 50%; height: 100%; background: #7f8c8d; transition: all 0.3s;"></div></div>
         </div>
         
-        <!-- NEW: Separate Insurance Box -->
         <div class="insurance-box waiting" id="insuranceBox">
-            <div class="insurance-label">INSURANCE (TC ≥ 3)</div>
-            <div class="insurance-status insurance-na" id="insuranceStatus">—</div>
-            <div class="insurance-detail" id="insuranceDetail">Enter dealer Ace to check</div>
-        </div>
-        
-        <!-- Double 11 Box -->
-        <div class="double-box">
-            <div style="font-size: 0.9em; margin-bottom: 8px; color: #bdc3c7; font-weight: bold;">Double on 11?</div>
-            <div id="double11Result" class="double-maybe">--</div>
-            <div class="prob-detail">
-                10s Probability: <span id="tenProb">--</span>%<br>
-                <span style="font-size: 0.85em; color: #7f8c8d;">Normal: 30.8% | Target: >32%</span>
-            </div>
-            <div style="font-size: 0.7em; margin-top: 8px; color: #95a5a6; font-style: italic;" id="double11Hint">
-                Enter cards to see 10s probability
+            <div style="font-size: 0.85em; color: #bdc3c7; margin-bottom: 5px;">INSURANCE</div>
+            <div class="insurance-wait" id="insuranceStatus">WAIT</div>
+            <div style="font-size: 0.75em; color: #7f8c8d; margin-top: 5px;" id="insuranceDetail">
+                Available after Hand 6<br>(Need more data)
             </div>
         </div>
         
-        <!-- Dealer Bust Probability Box -->
+        <div class="double-box waiting" id="doubleBox">
+            <div style="font-size: 0.9em; margin-bottom: 5px; color: #7f8c8d; font-weight: bold;">Double on 11?</div>
+            <div class="double-wait" id="double11Result">WAIT</div>
+            <div style="font-size: 0.75em; color: #7f8c8d; margin-top: 5px;" id="doubleDetail">
+                Available from Hand 4
+            </div>
+        </div>
+
+        <div class="hit-prob-box" id="hitProbBox" style="display: none;">
+            <div style="font-size: 0.9em; margin-bottom: 8px; color: #9b59b6; font-weight: bold;">Hit Probabilities</div>
+            <div id="hitProbContent" style="font-size: 0.85em;"></div>
+        </div>
+        
         <div class="bust-box">
-            <div style="font-size: 0.9em; margin-bottom: 5px; color: #bdc3c7;">Dealer Bust Probability</div>
-            <div id="bustChance" class="bust-med">--%</div>
-            <div class="prob-detail">
-                Base: <span id="bustBase">--</span>% | 10s Adj: <span id="bustAdj">0</span>%
-            </div>
-            <div style="font-size: 0.7em; margin-top: 8px; color: #7f8c8d; font-style: italic;" id="bustHint">
-                Enter dealer upcard to see odds
+            <div style="font-size: 0.9em; margin-bottom: 5px; color: #bdc3c7;">Dealer Outcome</div>
+            <div id="bustSimple" class="bust-simple bust-likely">Enter dealer card</div>
+            <div style="font-size: 0.8em; margin-top: 8px; color: #95a5a6; border-top: 1px solid #444; padding-top: 5px;">
+                <span id="bustComparison">Waiting for input...</span>
             </div>
         </div>
 
         <div class="stat-box">
-            <div>P1 BANKROLL: <span id="bankroll" style="color:#3498db;">$0.00</span></div>
+            <div>Bankroll: <span id="bankroll" style="color:#3498db;">$0.00</span></div>
         </div>
         <div class="history-panel" id="historyList"><b>History</b></div>
     </div>
 </div>
 
 <div class="guide-panel">
-    <h3>How To Use - Insurance Box</h3>
+    <h3>Hand-Aware System Rules</h3>
     <ul>
-        <li><b>— (Gray):</b> Dealer not showing Ace - Insurance not offered</li>
-        <li><b>YES (Green):</b> Dealer shows Ace AND TC ≥ 3 - Take insurance! (10s are rich)</li>
-        <li><b>NO (Red):</b> Dealer shows Ace but TC < 3 - Decline insurance (negative EV)</li>
-        <li><b>Live Updates:</b> Type "A" in dealer box → Box checks TC instantly and turns Green/Red</li>
-        <li><b>Hi-Opt II Index:</b> Insurance is the #1 priority index play at TC +3 or higher</li>
+        <li><b>Hands 1-3:</b> Basic strategy only. No Double/Insurance recommendations (not enough data).</li>
+        <li><b>Hand 4+:</b> "Double on 11?" box activates. Shows YES when 10s probability >33%.</li>
+        <li><b>Hand 6+:</b> "Insurance" box activates. Shows YES when dealer shows A and 10s density >35%.</li>
+        <li><b>Dealer Bust:</b> Simplified display - "Bust: Likely" (green) vs "Bust: Unlikely" (red).</li>
     </ul>
 </div>
 
 <script>
-    const strategy = { values: { '2': 1, '3': 1, '4': 2, '5': 2, '6': 1, '7': 1, '8': 0, '9': 0, '10': -2, 'j': -2, 'q': -2, 'k': -2, 'a': 0 } };
-    let pCount = 1, runningCount = 0, totalCards = 8 * 52, cardsDealt = 0, tensDealt = 0, lossStreak = 0, profit = 0;
+    const customValues = {
+        '2': 3.0, '3': 2.5, '4': 2.0, '5': 1.5, '6': 1.0, '7': 0, '8': -1.0, '9': -1.5,
+        '10': -2.0, 'j': -2.5, 'q': -3.0, 'k': -3.5, 'a': 0
+    };
+    
+    let dealtCounts = {
+        '2':0, '3':0, '4':0, '5':0, '6':0, '7':0, '8':0, '9':0,
+        '10':0, 'j':0, 'q':0, 'k':0, 'a':0
+    };
+    
+    let pCount = 1, runningCount = 0, cardsDealt = 0, lossStreak = 0, profit = 0;
+    let handCounter = 0;
 
     function calcHandTotal(handStr) {
         if (!handStr || handStr.trim() === '') return 0;
         const cards = handStr.toLowerCase().split(' ').filter(c => c !== '');
-        let total = 0;
-        let aces = 0;
-        
+        let total = 0, aces = 0;
         cards.forEach(card => {
             if (card === 'a') { aces++; total += 11; }
             else if (['j', 'q', 'k'].includes(card)) { total += 10; }
             else if (card === '10') { total += 10; }
             else { total += parseInt(card) || 0; }
         });
-        
         while (total > 21 && aces > 0) { total -= 10; aces--; }
         return total;
     }
@@ -221,317 +224,244 @@
         return handStr.toLowerCase().split(' ').filter(c => c !== '');
     }
 
-    function isSoftHand(handStr, total) {
-        const cards = getHandCards(handStr);
-        if (!cards.includes('a')) return false;
-        let hardTotal = 0;
-        let aces = 0;
-        cards.forEach(card => {
-            if (card === 'a') aces++;
-            else if (['j','q','k'].includes(card)) hardTotal += 10;
-            else if (card === '10') hardTotal += 10;
-            else hardTotal += parseInt(card) || 0;
-        });
-        hardTotal += aces;
-        return (total <= 21 && total !== hardTotal);
-    }
-
-    function isBlackjack(handStr) {
-        const cards = getHandCards(handStr);
-        if (cards.length !== 2) return false;
-        return calcHandTotal(handStr) === 21;
-    }
-
-    function isPair(handStr) {
-        const cards = getHandCards(handStr);
-        if (cards.length !== 2) return false;
-        const val = (card) => {
-            if (['j','q','k'].includes(card)) return 10;
-            if (card === 'a') return 11;
-            return parseInt(card);
-        };
-        return val(cards[0]) === val(cards[1]);
-    }
-
-    function getDealerUpcard() {
-        const dIn = document.getElementById('dealerHand').value;
-        if (!dIn) return null;
-        const firstCard = dIn.toLowerCase().trim().split(' ')[0];
-        if (!firstCard) return null;
-        
-        let val = parseInt(firstCard);
-        if (['j','q','k'].includes(firstCard)) val = 10;
-        else if (firstCard === 'a') val = 11;
-        return { value: val, card: firstCard };
-    }
-
-    function getPendingStats() {
+    function getPendingCards() {
         const allInputs = [document.getElementById('dealerHand'), ...document.querySelectorAll('.p-input')];
-        let pendingTens = 0;
-        let pendingRC = 0;
-        let pendingCards = 0;
-        
+        let pending = [];
         allInputs.forEach(input => {
             if (input && input.value) {
-                const cards = input.value.toLowerCase().split(' ').filter(c => c !== '');
-                cards.forEach(card => {
-                    if (['10','j','q','k'].includes(card)) pendingTens++;
-                    if (strategy.values.hasOwnProperty(card)) {
-                        pendingRC += strategy.values[card];
-                        pendingCards++;
-                    }
-                });
+                pending.push(...input.value.toLowerCase().split(' ').filter(c => c !== ''));
             }
         });
-        
-        return { pendingTens, pendingRC, pendingCards };
+        return pending;
     }
 
-    function calculateBustProbability(upcard, tensRemaining, totalRemainingCards, trueCount) {
-        if (!upcard) return null;
-        
-        const baseRates = {
-            2: 35.3, 3: 37.4, 4: 40.3, 5: 42.9, 6: 42.1,
-            7: 25.8, 8: 23.9, 9: 23.3, 10: 23.0, 11: 16.9
-        };
-        
-        if (!baseRates[upcard]) return null;
-        
-        let base = baseRates[upcard];
-        let adjustment = 0;
-        let hint = "";
-        
-        const normalTensDensity = 4/13;
-        const currentTensDensity = tensRemaining / totalRemainingCards;
-        const densityDiff = (currentTensDensity - normalTensDensity) * 100;
-        
-        if (upcard >= 2 && upcard <= 6) {
-            adjustment = densityDiff * 0.5;
-            if (densityDiff > 3) hint = `High 10s (${currentTensDensity.toFixed(1)}%): Dealer likely bust! 🔥`;
-            else if (densityDiff < -3) hint = `Low 10s (${currentTensDensity.toFixed(1)}%): Dealer safer`;
-            else hint = `Normal 10s (${currentTensDensity.toFixed(1)}%)`;
-            
-        } else if (upcard >= 7 && upcard <= 9) {
-            adjustment = densityDiff * -0.3;
-            hint = `10s density: ${currentTensDensity.toFixed(1)}%`;
-            
-        } else {
-            adjustment = densityDiff * -0.4;
-            hint = `10s density: ${currentTensDensity.toFixed(1)}%`;
+    function calculateRemainingCounts() {
+        const decks = parseInt(document.getElementById('numDecks').value);
+        let remaining = {};
+        for (let card in dealtCounts) {
+            remaining[card] = (decks * 4) - dealtCounts[card];
         }
-        
-        let final = base + adjustment;
-        final = Math.max(5, Math.min(95, final));
-        
-        return {
-            base: base.toFixed(1),
-            final: final.toFixed(1),
-            adjustment: (adjustment > 0 ? "+" : "") + adjustment.toFixed(1),
-            density: (currentTensDensity * 100).toFixed(1),
-            hint: hint
-        };
+        const pending = getPendingCards();
+        pending.forEach(card => {
+            if (remaining[card] !== undefined) remaining[card]--;
+        });
+        return remaining;
     }
 
-    function calculateDouble11(tensRemaining, totalRemainingCards) {
-        if (totalRemainingCards <= 0) return null;
-        
-        const probability = (tensRemaining / totalRemainingCards) * 100;
-        const normalProb = 30.77;
-        
-        let recommendation, className, hint;
-        
-        if (probability >= 32) {
-            recommendation = "YES ✓";
-            className = "double-yes";
-            hint = `High 10s probability (${probability.toFixed(1)}%) - Double that 11!`;
-        } else if (probability >= 28) {
-            recommendation = "MAYBE ~";
-            className = "double-maybe";
-            hint = `Standard odds (${probability.toFixed(1)}%) - Double vs 2-10, hit vs Ace`;
-        } else {
-            recommendation = "NO ✗";
-            className = "double-no";
-            hint = `Low 10s (${probability.toFixed(1)}%) - Just hit, deck is 10-poor`;
-        }
-        
-        return {
-            probability: probability.toFixed(1),
-            recommendation: recommendation,
-            className: className,
-            hint: hint,
-            normal: normalProb.toFixed(1)
-        };
-    }
-
-    // NEW: Update Insurance Box separately
-    function updateInsuranceBox(liveTC) {
-        const dealer = getDealerUpcard();
-        const box = document.getElementById('insuranceBox');
-        const status = document.getElementById('insuranceStatus');
-        const detail = document.getElementById('insuranceDetail');
-        
-        if (!dealer || dealer.card !== 'a') {
-            // Dealer not showing Ace
-            box.className = 'insurance-box waiting';
-            status.className = 'insurance-status insurance-na';
-            status.textContent = '—';
-            detail.textContent = 'Waiting for dealer Ace...';
-            return;
-        }
-        
-        // Dealer is showing Ace - check TC
-        if (liveTC >= 3) {
-            box.className = 'insurance-box active-yes';
-            status.className = 'insurance-status insurance-yes';
-            status.textContent = 'YES';
-            detail.textContent = `TC ${liveTC.toFixed(1)} ≥ 3: Take Insurance! 🔥`;
-        } else {
-            box.className = 'insurance-box active-no';
-            status.className = 'insurance-status insurance-no';
-            status.textContent = 'NO';
-            detail.textContent = `TC ${liveTC.toFixed(1)} < 3: Decline Insurance`;
-        }
+    function getTensInfo(remaining) {
+        const tens = remaining['10'] + remaining['j'] + remaining['q'] + remaining['k'];
+        const total = Object.values(remaining).reduce((a,b) => a+b, 0);
+        const density = total > 0 ? (tens / total) * 100 : 0;
+        return { tens, total, density };
     }
 
     function updateLiveDisplay() {
         const decks = parseInt(document.getElementById('numDecks').value);
-        const { pendingTens, pendingRC, pendingCards } = getPendingStats();
+        const pending = getPendingCards();
+        const remaining = calculateRemainingCounts();
+        const tensInfo = getTensInfo(remaining);
         
-        const committedTensRem = decks * 16 - tensDealt;
-        const committedRC = runningCount;
-        const committedTotalRem = totalCards - cardsDealt;
-        const committedTC = committedRC / Math.max(0.5, committedTotalRem / 52);
+        let liveRC = runningCount;
+        pending.forEach(card => {
+            if (customValues[card] !== undefined) liveRC += customValues[card];
+        });
+        const totalRemaining = (decks * 52) - cardsDealt - pending.length;
+        const liveTC = totalRemaining > 0 ? liveRC / (totalRemaining / 52) : 0;
         
-        const liveTensRem = committedTensRem - pendingTens;
-        const liveRC = committedRC + pendingRC;
-        const liveTotalRem = committedTotalRem - pendingCards;
-        const liveDecksRem = Math.max(0.5, liveTotalRem / 52);
-        const liveTC = liveRC / liveDecksRem;
+        document.getElementById('countVal').innerText = liveRC.toFixed(1);
+        document.getElementById('trueCountVal').innerText = liveTC.toFixed(2);
+        document.getElementById('handCount').innerText = handCounter;
         
-        const hasPending = pendingCards > 0;
-        
-        // 10s Remaining
-        document.getElementById('tensRemaining').innerText = liveTensRem;
-        document.getElementById('tensRemaining').style.color = hasPending ? '#e67e22' : '#e74c3c';
-        
-        const tensCommEl = document.getElementById('tensCommitted');
-        if (hasPending) {
-            tensCommEl.innerText = `(${committedTensRem})`;
-            tensCommEl.style.display = 'inline';
-        } else {
-            tensCommEl.style.display = 'none';
-        }
-        
-        // 10s Density
-        const density = (liveTensRem / liveTotalRem * 100).toFixed(1);
-        document.getElementById('tensDensity').innerText = density;
-        
-        // Running Count
-        document.getElementById('countVal').innerText = liveRC;
-        document.getElementById('countVal').className = hasPending ? 'live-indicator' : '';
-        
-        const countCommEl = document.getElementById('countCommitted');
-        if (hasPending) {
-            countCommEl.innerText = `(${committedRC})`;
-            countCommEl.style.display = 'inline';
-        } else {
-            countCommEl.style.display = 'none';
-        }
-        
-        // True Count
-        document.getElementById('trueCountVal').innerText = liveTC.toFixed(1);
-        document.getElementById('trueCountVal').className = hasPending ? 'live-indicator' : '';
-        document.getElementById('trueCountVal').style.color = hasPending ? '#e67e22' : '#f1c40f';
-        
-        const tcCommEl = document.getElementById('tcCommitted');
-        if (hasPending) {
-            tcCommEl.innerText = `(${committedTC.toFixed(1)})`;
-            tcCommEl.style.display = 'inline';
-        } else {
-            tcCommEl.style.display = 'none';
-        }
-        
-        // NEW: Update Insurance Box (checks dealer for 'A')
-        updateInsuranceBox(liveTC);
-        
-        // Update Double 11 box
-        const double11Calc = calculateDouble11(liveTensRem, liveTotalRem);
-        if (double11Calc) {
-            const resultEl = document.getElementById('double11Result');
-            resultEl.textContent = double11Calc.recommendation;
-            resultEl.className = double11Calc.className;
-            document.getElementById('tenProb').textContent = double11Calc.probability;
-            document.getElementById('double11Hint').textContent = double11Calc.hint;
-        }
-        
-        // Update Bust Probability
-        const dealer = getDealerUpcard();
-        if (dealer) {
-            const bustCalc = calculateBustProbability(dealer.value, liveTensRem, liveTotalRem, liveTC);
-            if (bustCalc) {
-                const bustEl = document.getElementById('bustChance');
-                bustEl.textContent = bustCalc.final + '%';
-                document.getElementById('bustBase').textContent = bustCalc.base;
-                document.getElementById('bustAdj').textContent = bustCalc.adjustment;
-                document.getElementById('bustHint').textContent = bustCalc.hint;
-                
-                if (parseFloat(bustCalc.final) >= 40) bustEl.className = 'bust-high';
-                else if (parseFloat(bustCalc.final) >= 25) bustEl.className = 'bust-med';
-                else bustEl.className = 'bust-low';
-            }
-        } else {
-            document.getElementById('bustChance').textContent = '--%';
-            document.getElementById('bustChance').className = 'bust-med';
-            document.getElementById('bustBase').textContent = '--';
-            document.getElementById('bustAdj').textContent = '0';
-            document.getElementById('bustHint').textContent = 'Enter dealer upcard to see odds';
-        }
-        
-        // Update thermo
-        let thermoPercent = ((liveTC + 5) / 10) * 100;
+        let thermoPercent = ((liveTC + 8) / 16) * 100;
         thermoPercent = Math.min(100, Math.max(0, thermoPercent));
         document.getElementById('thermo').style.width = thermoPercent + '%';
+        if (liveTC >= 4) document.getElementById('thermo').style.background = "#27ae60";
+        else if (liveTC <= -4) document.getElementById('thermo').style.background = "#e74c3c";
+        else document.getElementById('thermo').style.background = "#f1c40f";
         
-        if (liveTC >= 3) document.getElementById('thermo').style.background = '#27ae60';
-        else if (liveTC <= -3) document.getElementById('thermo').style.background = '#e74c3c';
-        else document.getElementById('thermo').style.background = '#f1c40f';
+        updateInsuranceBox(tensInfo.density, tensInfo.tens, tensInfo.total);
+        updateDoubleBox(tensInfo.tens, tensInfo.total);
+        updateBustBoxSimple(tensInfo.density);
+        updateHitProbabilities();
     }
 
-    function getAdviceLogic(pTotal, dCard, cardCount, soft, isPair, isBJ) {
-        if (isBJ) return 'BLACKJACK!';
-        if (pTotal > 21) return 'BUST';
-        if (!dCard) return 'Waiting for dealer...';
+    function updateInsuranceBox(density, tensCount, totalCount) {
+        const box = document.getElementById('insuranceBox');
+        const status = document.getElementById('insuranceStatus');
+        const detail = document.getElementById('insuranceDetail');
         
-        if (isPair && cardCount === 2) {
-            const cards = getHandCards(document.querySelector('.p-input').value);
-            const card = cards[0];
-            if (['a','8'].includes(card)) return 'SPLIT';
-            if (card === '9' && dCard !== 7 && dCard !== 10 && dCard !== 11) return 'SPLIT';
-            if (['2','3','7'].includes(card) && dCard >= 2 && dCard <= 7) return 'SPLIT (or Hit)';
-            if (card === '6' && dCard >= 2 && dCard <= 6) return 'SPLIT (or Hit)';
-            if (card === '4' && dCard >= 5 && dCard <= 6) return 'SPLIT (or Hit)';
+        const dealerFirst = document.getElementById('dealerHand').value.toLowerCase().trim().split(' ')[0];
+        
+        if (handCounter < 6) {
+            box.className = 'insurance-box waiting';
+            status.className = 'insurance-wait';
+            status.innerText = 'WAIT';
+            detail.innerHTML = `Hand ${handCounter}/6<br>Need 6+ hands for accuracy`;
+            return;
         }
         
-        if (soft && cardCount === 2) {
-            if (pTotal >= 19) return 'STAND';
-            if (pTotal === 18) {
-                if (dCard >= 2 && dCard <= 6) return 'DOUBLE (or Stand)';
-                if (dCard === 7 || dCard === 8) return 'STAND';
-                return 'HIT';
+        if (dealerFirst !== 'a') {
+            box.className = 'insurance-box waiting';
+            status.className = 'insurance-wait';
+            status.innerText = '—';
+            detail.innerText = `10s: ${density.toFixed(1)}% (Wait for Ace)`;
+            return;
+        }
+        
+        if (density >= 35) {
+            box.className = 'insurance-box active-yes';
+            status.className = 'insurance-yes';
+            status.innerText = 'YES ✓';
+            detail.innerHTML = `10s: ${density.toFixed(1)}% ≥ 35%<br><span style="color:#27ae60">Take Insurance!</span>`;
+        } else {
+            box.className = 'insurance-box active-no';
+            status.className = 'insurance-no';
+            status.innerText = 'NO ✗';
+            detail.innerHTML = `10s: ${density.toFixed(1)}% < 35%<br><span style="color:#e74c3c">Skip Insurance</span>`;
+        }
+    }
+
+    function updateDoubleBox(tensCount, totalCount) {
+        const box = document.getElementById('doubleBox');
+        const status = document.getElementById('double11Result');
+        const detail = document.getElementById('doubleDetail');
+        
+        if (handCounter < 4) {
+            box.className = 'double-box waiting';
+            status.className = 'double-wait';
+            status.innerText = 'WAIT';
+            detail.innerHTML = `Hand ${handCounter}/4<br>Available from Hand 4`;
+            return;
+        }
+        
+        if (totalCount <= 0) return;
+        const prob = (tensCount / totalCount) * 100;
+        
+        detail.innerText = `10s Probability: ${prob.toFixed(1)}%`;
+        
+        if (prob >= 33) {
+            box.className = 'double-box';
+            status.className = 'double-yes';
+            status.innerHTML = 'YES ✓';
+            detail.innerHTML += '<br><span style="color:#27ae60">Double that 11!</span>';
+        } else if (prob >= 29) {
+            box.className = 'double-box';
+            status.className = 'double-no';
+            status.innerHTML = 'MAYBE';
+            detail.innerHTML += '<br>Double vs 2-10, hit vs A';
+        } else {
+            box.className = 'double-box';
+            status.className = 'double-no';
+            status.innerHTML = 'NO ✗';
+            detail.innerHTML += '<br><span style="color:#e74c3c">Just hit 11</span>';
+        }
+    }
+
+    function updateBustBoxSimple(density) {
+        const dealerStr = document.getElementById('dealerHand').value.toLowerCase().trim();
+        if (!dealerStr) {
+            document.getElementById('bustSimple').innerText = 'Enter dealer card';
+            document.getElementById('bustSimple').className = 'bust-simple';
+            document.getElementById('bustComparison').innerText = 'Waiting...';
+            return;
+        }
+        
+        const dealerCard = dealerStr.split(' ')[0];
+        let dVal = parseInt(dealerCard);
+        if (['j','q','k'].includes(dealerCard)) dVal = 10;
+        else if (dealerCard === 'a') dVal = 11;
+        
+        if (!dVal) return;
+        
+        const normalDensity = 30.8;
+        const isHighDensity = density > (normalDensity + 2);
+        const isLowDensity = density < (normalDensity - 2);
+        
+        let bustText, bustClass, comparison;
+        
+        if (dVal >= 2 && dVal <= 6) {
+            if (isHighDensity) {
+                bustText = 'BUST: Likely';
+                bustClass = 'bust-likely';
+                comparison = `High 10s (${density.toFixed(0)}%) → Dealer will bust`;
+            } else if (isLowDensity) {
+                bustText = 'BUST: Unlikely';
+                bustClass = 'bust-unlikely';
+                comparison = `Low 10s (${density.toFixed(0)}%) → Dealer safe`;
+            } else {
+                bustText = 'BUST: Normal';
+                bustClass = 'bust-likely';
+                comparison = `Normal 10s (${density.toFixed(0)}%)`;
             }
-            if (pTotal === 17) return (dCard >= 3 && dCard <= 6) ? 'DOUBLE (or Hit)' : 'HIT';
-            if (pTotal === 15 || pTotal === 16) return (dCard >= 4 && dCard <= 6) ? 'DOUBLE (or Hit)' : 'HIT';
-            if (pTotal === 13 || pTotal === 14) return (dCard >= 5 && dCard <= 6) ? 'DOUBLE (or Hit)' : 'HIT';
+        } else {
+            if (isHighDensity) {
+                bustText = 'BUST: Unlikely';
+                bustClass = 'bust-unlikely';
+                comparison = `High 10s (${density.toFixed(0)}%) → Dealer makes hand`;
+            } else if (isLowDensity) {
+                bustText = 'BUST: More Likely';
+                bustClass = 'bust-likely';
+                comparison = `Low 10s (${density.toFixed(0)}%)`;
+            } else {
+                bustText = 'BUST: Normal';
+                bustClass = 'bust-likely';
+                comparison = `Normal 10s (${density.toFixed(0)}%)`;
+            }
         }
         
-        if (pTotal >= 17) return 'STAND';
-        if (pTotal >= 13 && pTotal <= 16) return (dCard >= 2 && dCard <= 6) ? 'STAND' : 'HIT';
-        if (pTotal === 12) return (dCard >= 4 && dCard <= 6) ? 'STAND' : 'HIT';
-        if (pTotal === 11) return (dCard !== 11) ? 'DOUBLE (or Hit)' : 'HIT';
-        if (pTotal === 10) return (dCard >= 2 && dCard <= 9) ? 'DOUBLE (or Hit)' : 'HIT';
-        if (pTotal === 9) return (dCard >= 3 && dCard <= 6) ? 'DOUBLE (or Hit)' : 'HIT';
+        document.getElementById('bustSimple').innerText = bustText;
+        document.getElementById('bustSimple').className = 'bust-simple ' + bustClass;
+        document.getElementById('bustComparison').innerText = comparison;
+    }
+
+    function updateHitProbabilities() {
+        const p1Hand = document.getElementById('p1Hand').value;
+        if (!p1Hand || !p1Hand.trim()) {
+            document.getElementById('hitProbBox').style.display = 'none';
+            return;
+        }
         
-        return 'HIT';
+        const total = calcHandTotal(p1Hand);
+        const remaining = calculateRemainingCounts();
+        const totalRem = Object.values(remaining).reduce((a,b) => a+b, 0);
+        if (totalRem <= 0) return;
+        
+        let html = `<div style="margin-bottom:5px; font-weight:bold;">Total: ${total} (need ${21-total})</div>`;
+        
+        const need = 21 - total;
+        if (need >= 2 && need <= 11) {
+            const needCards = need === 10 ? ['10','j','q','k'] : [need.toString()];
+            let needCount = 0;
+            needCards.forEach(c => needCount += remaining[c]);
+            const needPct = (needCount / totalRem * 100).toFixed(1);
+            html += `<div class="prob-item"><span>Get ${need}:</span> <span class="prob-good">${needPct}%</span></div>`;
+            
+            if (need > 2) {
+                const need2 = need - 1;
+                const need2Cards = need2 === 10 ? ['10','j','q','k'] : [need2.toString()];
+                let need2Count = 0;
+                need2Cards.forEach(c => need2Count += remaining[c]);
+                const need2Pct = (need2Count / totalRem * 100).toFixed(1);
+                html += `<div class="prob-item"><span>Get ${need2}:</span> <span class="prob-neutral">${need2Pct}%</span></div>`;
+            }
+        }
+        
+        const bustCards = ['7','8','9','10','j','q','k','a'];
+        const safeCards = ['2','3','4','5','6'];
+        let bustCount = 0, safeCount = 0;
+        bustCards.forEach(c => bustCount += remaining[c]);
+        safeCards.forEach(c => safeCount += remaining[c]);
+        
+        const bustPct = (bustCount / totalRem * 100).toFixed(1);
+        const safePct = (safeCount / totalRem * 100).toFixed(1);
+        
+        html += `<div style="border-top:1px solid #444; margin-top:5px; padding-top:5px;">`;
+        html += `<div class="prob-item"><span>BUST:</span> <span class="prob-bad">${bustPct}%</span></div>`;
+        html += `<div class="prob-item"><span>SAFE:</span> <span class="prob-good">${safePct}%</span></div>`;
+        html += `</div>`;
+        
+        document.getElementById('hitProbContent').innerHTML = html;
+        document.getElementById('hitProbBox').style.display = 'block';
     }
 
     function updateDealerDisplay() {
@@ -541,82 +471,68 @@
         
         if (cards.length === 0) {
             infoEl.className = 'advice-text dealer-total';
-            infoEl.textContent = 'Enter dealer upcard (e.g., 6 or A)';
-            updateAllPlayerAdvice();
-            updateLiveDisplay();
-            return;
-        }
-        
-        const upcard = cards[0].toUpperCase();
-        const total = calcHandTotal(handStr);
-        
-        if (cards.length === 1) {
-            infoEl.className = 'advice-text dealer-total';
-            if (upcard === 'A') {
-                infoEl.textContent = `Dealer shows: ${upcard} ⚠️ Check Insurance Box!`;
-                infoEl.style.background = '#e74c3c'; // Highlight when Ace shows
-            } else {
-                infoEl.textContent = `Dealer shows: ${upcard} | Add hole card after space when ready`;
-                infoEl.style.background = '#2980b9';
-            }
-        } else {
-            infoEl.className = 'advice-text dealer-total';
-            infoEl.textContent = `Dealer hand: ${cards.length} cards, Total: ${total} (Upcard was ${upcard})`;
+            infoEl.textContent = 'Enter dealer upcard';
             infoEl.style.background = '#2980b9';
+        } else {
+            const upcard = cards[0].toUpperCase();
+            infoEl.className = 'advice-text dealer-total';
+            if (upcard === 'A' && handCounter < 6) {
+                infoEl.style.background = '#e67e22';
+                infoEl.textContent = `Dealer: A - Insurance waits (Hand ${handCounter}/6)`;
+            } else {
+                infoEl.style.background = '#2980b9';
+                infoEl.textContent = `Dealer: ${upcard}`;
+            }
         }
         
-        updateAllPlayerAdvice();
-        updateLiveDisplay();
+        updateAdvice('p1Hand');
+    }
+
+    function getAdviceLogic(total, dealerUp) {
+        if (total > 21) return 'BUST';
+        if (total >= 17) return 'STAND';
+        if (total >= 13 && total <= 16) return (dealerUp >= 2 && dealerUp <= 6) ? 'STAND' : 'HIT';
+        if (total === 12) return (dealerUp >= 4 && dealerUp <= 6) ? 'STAND' : 'HIT';
+        if (total === 11) return (dealerUp !== 11) ? 'DOUBLE' : 'HIT';
+        if (total === 10) return (dealerUp >= 2 && dealerUp <= 9) ? 'DOUBLE' : 'HIT';
+        if (total === 9) return (dealerUp >= 3 && dealerUp <= 6) ? 'DOUBLE' : 'HIT';
+        return 'HIT';
     }
 
     function updateAdvice(playerId) {
         const handStr = document.getElementById(playerId).value;
         const adviceEl = document.getElementById(playerId.replace('Hand', '-advice'));
-        const dealer = getDealerUpcard();
-        const dCard = dealer ? dealer.value : null;
+        const dealerStr = document.getElementById('dealerHand').value.toLowerCase().trim();
+        const dealerCard = dealerStr.split(' ')[0];
         
         if (!adviceEl) return;
         
-        if (!dCard) {
+        if (!dealerCard) {
             adviceEl.className = 'advice-text advice-wait';
-            adviceEl.textContent = 'Enter dealer upcard first...';
-            updateLiveDisplay();
+            adviceEl.textContent = 'Enter dealer first...';
             return;
         }
         
-        if (!handStr || handStr.trim() === '') {
+        if (!handStr || !handStr.trim()) {
             adviceEl.className = 'advice-text advice-wait';
             adviceEl.textContent = 'Enter your cards...';
-            updateLiveDisplay();
             return;
         }
         
-        const cards = getHandCards(handStr);
-        const total = calcHandTotal(handStr);
-        const soft = isSoftHand(handStr, total);
-        const pair = isPair(handStr);
-        const bj = isBlackjack(handStr);
+        let dVal = parseInt(dealerCard);
+        if (['j','q','k'].includes(dealerCard)) dVal = 10;
+        else if (dealerCard === 'a') dVal = 11;
         
-        const action = getAdviceLogic(total, dCard, cards.length, soft, pair, bj);
+        const total = calcHandTotal(handStr);
+        const action = getAdviceLogic(total, dVal);
         
         adviceEl.className = 'advice-text';
-        if (action.includes('HIT') && !action.includes('BUST')) adviceEl.classList.add('advice-hit');
-        else if (action.includes('STAND')) adviceEl.classList.add('advice-stand');
-        else if (action.includes('DOUBLE')) adviceEl.classList.add('advice-double');
-        else if (action.includes('SPLIT')) adviceEl.classList.add('advice-split');
-        else if (action.includes('BUST')) adviceEl.classList.add('advice-bust');
-        else if (action.includes('BLACKJACK')) adviceEl.classList.add('advice-blackjack');
-        else adviceEl.classList.add('advice-wait');
+        if (action === 'BUST') adviceEl.classList.add('advice-bust');
+        else if (action === 'HIT') adviceEl.classList.add('advice-hit');
+        else if (action === 'STAND') adviceEl.classList.add('advice-stand');
+        else if (action === 'DOUBLE') adviceEl.classList.add('advice-double');
         
-        adviceEl.textContent = `Total ${total}${soft ? ' Soft' : ''} vs Dealer ${dCard}: ${action}`;
-        
-        updateLiveDisplay();
-    }
-
-    function updateAllPlayerAdvice() {
-        document.querySelectorAll('.p-input').forEach(input => {
-            updateAdvice(input.id);
-        });
+        adviceEl.textContent = `${total} vs ${dVal}: ${action}`;
     }
 
     function addPlayer() {
@@ -630,7 +546,7 @@
         const adviceDiv = document.createElement('div');
         adviceDiv.className = 'advice-text advice-wait';
         adviceDiv.id = `p${pCount}-advice`;
-        adviceDiv.textContent = 'Waiting for dealer upcard...';
+        adviceDiv.textContent = 'Waiting...';
         document.getElementById('playerList').appendChild(adviceDiv);
     }
 
@@ -640,7 +556,6 @@
         
         const dTot = calcHandTotal(dIn.value);
         const p1Tot = calcHandTotal(p1In.value);
-        
         const currentBet = parseFloat(document.getElementById('baseBet').value) * Math.pow(2, lossStreak);
         
         let p1Status;
@@ -653,34 +568,33 @@
         if (p1Status === 'LOSS' || p1Status === 'BUST') { profit -= currentBet; lossStreak++; }
         else if (p1Status === 'WIN') { profit += currentBet; lossStreak = 0; }
         
-        let cardsProcessed = 0;
-        [dIn, ...document.querySelectorAll('.p-input')].forEach(inp => {
-            if (inp.value && inp.value.trim() !== '') {
-                inp.value.toLowerCase().split(' ').forEach(card => {
-                    if (card && strategy.values.hasOwnProperty(card)) {
-                        if (['10', 'j', 'q', 'k'].includes(card)) tensDealt++;
-                        runningCount += strategy.values[card];
-                        cardsDealt++;
-                        cardsProcessed++;
-                    }
-                });
-                inp.value = '';
+        const pending = getPendingCards();
+        pending.forEach(card => {
+            if (dealtCounts[card] !== undefined) {
+                dealtCounts[card]++;
+                cardsDealt++;
+                runningCount += customValues[card];
+            }
+        });
+        
+        handCounter++;
+        
+        document.getElementById('dealerHand').value = '';
+        document.querySelectorAll('.p-input').forEach(inp => inp.value = '');
+        
+        document.querySelectorAll('.advice-text').forEach(el => {
+            if (el.id !== 'dealer-info') {
+                el.className = 'advice-text advice-wait';
+                el.textContent = 'Waiting...';
             }
         });
         
         updateDealerDisplay();
-        document.querySelectorAll('.advice-text').forEach(el => {
-            if (el.id !== 'dealer-info') {
-                el.className = 'advice-text advice-wait';
-                el.textContent = 'Waiting for dealer upcard...';
-            }
-        });
-        
         updateLiveDisplay();
+        updateDashboardBankroll();
         
-        const decksRemaining = Math.max(0.5, (totalCards - cardsDealt) / 52);
-        const tc = Math.round(runningCount / decksRemaining);
-        document.getElementById('historyList').innerHTML += `<div>TC: ${tc} | P1:${p1Status} | Cards:${cardsProcessed}</div>`;
+        document.getElementById('historyList').innerHTML += 
+            `<div>Hand ${handCounter}: TC ${(runningCount / ((parseInt(document.getElementById('numDecks').value)*52-cardsDealt)/52)).toFixed(1)} | ${p1Status}</div>`;
     }
 
     function updateDashboardBankroll() {
@@ -690,15 +604,25 @@
 
     function resetDeck() {
         const decks = parseInt(document.getElementById('numDecks').value);
-        totalCards = decks * 52;
-        cardsDealt = 0; tensDealt = 0; runningCount = 0; lossStreak = 0; profit = 0;
+        
+        dealtCounts = {
+            '2':0, '3':0, '4':0, '5':0, '6':0, '7':0, '8':0, '9':0,
+            '10':0, 'j':0, 'q':0, 'k':0, 'a':0
+        };
+        cardsDealt = 0;
+        runningCount = 0;
+        lossStreak = 0;
+        profit = 0;
+        handCounter = 0;
         
         document.getElementById('historyList').innerHTML = '<b>History</b>';
         document.getElementById('dealerHand').value = '';
         document.querySelectorAll('.p-input').forEach(inp => inp.value = '');
+        document.getElementById('hitProbBox').style.display = 'none';
         
         updateDealerDisplay();
         updateLiveDisplay();
+        updateDashboardBankroll();
     }
     
     resetDeck();
