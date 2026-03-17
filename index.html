@@ -100,6 +100,37 @@
         }
     });
 
+    // FIXED: Proper Blackjack calculation with flexible Ace values (11 or 1)
+    function calcHandTotal(handStr) {
+        if (!handStr || handStr.trim() === '') return 0;
+        
+        const cards = handStr.toLowerCase().split(' ').filter(c => c !== '');
+        let total = 0;
+        let aces = 0;
+        
+        // Calculate total counting Aces as 11 initially
+        cards.forEach(card => {
+            if (card === 'a') {
+                aces++;
+                total += 11;  // Ace starts as 11
+            } else if (['j', 'q', 'k'].includes(card)) {
+                total += 10;  // Face cards = 10
+            } else if (card === '10') {
+                total += 10;  // Ten = 10
+            } else {
+                total += parseInt(card) || 0;  // Number cards
+            }
+        });
+        
+        // Adjust Aces from 11 to 1 as needed to prevent busting
+        while (total > 21 && aces > 0) {
+            total -= 10;  // Convert an Ace from 11 to 1
+            aces--;
+        }
+        
+        return total;
+    }
+
     function addPlayer() {
         if (pCount >= 8) return;
         pCount++;
@@ -110,49 +141,120 @@
     }
 
     function getAdvice(id) {
-        const h = document.getElementById(id).value.toLowerCase().split(' ');
-        let t = h.reduce((s, c) => s + (parseInt(c) || (['j','q','k'].includes(c)?10: (c==='a'?11:0))), 0);
-        alert("P" + id.replace('p','').replace('Hand','') + " Total: " + t + " -> " + (t > 21 ? "BUST" : (t >= 17 ? "STAND" : "HIT")));
+        const handStr = document.getElementById(id).value;
+        const t = calcHandTotal(handStr);
+        const playerNum = id.replace('p', '').replace('Hand', '');
+        
+        let action;
+        if (t > 21) {
+            action = "BUST";
+        } else if (t >= 17) {
+            action = "STAND";
+        } else {
+            action = "HIT";
+        }
+        
+        alert("P" + playerNum + " Total: " + t + " -> " + action);
     }
 
     function logRound() {
-        const dIn = document.getElementById('dealerHand'), p1In = document.getElementById('p1Hand');
-        const calcTotal = (c) => c.reduce((s, x) => s + (parseInt(x) || (['j','q','k'].includes(x)?10: (x==='a'?11:0))), 0);
-        const dTot = calcTotal(dIn.value.toLowerCase().split(' ')), p1Tot = calcTotal(p1In.value.toLowerCase().split(' '));
+        const dIn = document.getElementById('dealerHand');
+        const p1In = document.getElementById('p1Hand');
+        
+        // FIXED: Use calcHandTotal for both dealer and player
+        const dTot = calcHandTotal(dIn.value);
+        const p1Tot = calcHandTotal(p1In.value);
+        
         const currentBet = parseFloat(document.getElementById('baseBet').value) * Math.pow(2, lossStreak);
-        let p1Status = (p1Tot > 21) ? "BUST" : (dTot > 21) ? "WIN" : (p1Tot > dTot) ? "WIN" : (p1Tot < dTot) ? "LOSS" : "PUSH";
-        if(p1Status === "LOSS" || p1Status === "BUST") { profit -= currentBet; lossStreak++; }
-        else if(p1Status === "WIN") { profit += currentBet; lossStreak = 0; }
+        
+        // Determine result
+        let p1Status;
+        if (p1Tot > 21) {
+            p1Status = "BUST";
+        } else if (dTot > 21) {
+            p1Status = "WIN";
+        } else if (p1Tot > dTot) {
+            p1Status = "WIN";
+        } else if (p1Tot < dTot) {
+            p1Status = "LOSS";
+        } else {
+            p1Status = "PUSH";
+        }
+        
+        // Update profit and streak
+        if (p1Status === "LOSS" || p1Status === "BUST") { 
+            profit -= currentBet; 
+            lossStreak++; 
+        } else if (p1Status === "WIN") { 
+            profit += currentBet; 
+            lossStreak = 0; 
+        }
+        
+        // Process cards for counting (only non-empty cards)
         [dIn, ...document.querySelectorAll('.p-input')].forEach(inp => {
-            inp.value.toLowerCase().split(' ').forEach(card => {
-                if (['10', 'j', 'q', 'k'].includes(card)) { tensDealt++; }
-                if(strategy.values.hasOwnProperty(card)) { runningCount += strategy.values[card]; cardsDealt++; }
-            });
-            inp.value = "";
+            if (inp.value && inp.value.trim() !== '') {
+                inp.value.toLowerCase().split(' ').forEach(card => {
+                    if (card && strategy.values.hasOwnProperty(card)) {
+                        if (['10', 'j', 'q', 'k'].includes(card)) { 
+                            tensDealt++; 
+                        }
+                        runningCount += strategy.values[card]; 
+                        cardsDealt++;
+                    }
+                });
+                inp.value = "";
+            }
         });
+        
         updateDashboard();
-        document.getElementById('historyList').innerHTML += `<div>TC: ${Math.round(runningCount / Math.max(0.5, (totalCards-cardsDealt)/52))} P1:${p1Status}</div>`;
+        
+        // Calculate True Count for history
+        const decksRemaining = Math.max(0.5, (totalCards - cardsDealt) / 52);
+        const tc = Math.round(runningCount / decksRemaining);
+        document.getElementById('historyList').innerHTML += `<div>TC: ${tc} P1:${p1Status}</div>`;
     }
 
     function updateDashboard() {
         const decks = parseInt(document.getElementById('numDecks').value);
-        let tc = runningCount / Math.max(0.5, (totalCards - cardsDealt) / 52);
+        const remainingCards = totalCards - cardsDealt;
+        const decksRemaining = Math.max(0.5, remainingCards / 52);
+        const tc = runningCount / decksRemaining;
+        
         document.getElementById('countVal').innerText = runningCount;
         document.getElementById('trueCountVal').innerText = tc.toFixed(1);
         document.getElementById('tensRemaining').innerText = (decks * 16 - tensDealt);
         document.getElementById('bankroll').innerText = "$" + profit.toFixed(2);
         document.getElementById('nextBet').innerText = "$" + (parseFloat(document.getElementById('baseBet').value) * Math.pow(2, lossStreak)).toFixed(2);
-        document.getElementById('thermo').style.width = Math.min(100, Math.max(0, ((tc + 5) / 10) * 100)) + "%";
+        
+        // Thermo bar: -5 to +5 range mapped to 0-100%
+        let thermoPercent = ((tc + 5) / 10) * 100;
+        thermoPercent = Math.min(100, Math.max(0, thermoPercent));
+        document.getElementById('thermo').style.width = thermoPercent + "%";
+        
+        // Color coding based on count
+        if (tc >= 3) {
+            document.getElementById('thermo').style.background = "#27ae60";  // Green
+        } else if (tc <= -3) {
+            document.getElementById('thermo').style.background = "#e74c3c";  // Red
+        } else {
+            document.getElementById('thermo').style.background = "#f1c40f";  // Yellow
+        }
+        
         document.getElementById('insResult').innerText = tc >= 3 ? "YES" : "NO";
     }
 
     function resetDeck() {
         const decks = parseInt(document.getElementById('numDecks').value);
         totalCards = decks * 52;
-        cardsDealt = 0; tensDealt = 0; runningCount = 0; lossStreak = 0; profit = 0;
+        cardsDealt = 0; 
+        tensDealt = 0; 
+        runningCount = 0; 
+        lossStreak = 0; 
+        profit = 0;
         updateDashboard();
         document.getElementById('historyList').innerHTML = "<b>History</b>";
     }
+    
     resetDeck();
 </script>
 </body>
