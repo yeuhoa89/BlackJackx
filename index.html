@@ -486,6 +486,7 @@
         }
         
         updateAdvice('p1Hand');
+        updateLiveDisplay();  // FIXED: Added this to update Dealer Outcome in real-time
     }
 
     function getAdviceLogic(total, dealerUp) {
@@ -510,12 +511,14 @@
         if (!dealerCard) {
             adviceEl.className = 'advice-text advice-wait';
             adviceEl.textContent = 'Enter dealer first...';
+            updateLiveDisplay();  // FIXED: Added this to update probabilities even when waiting
             return;
         }
         
         if (!handStr || !handStr.trim()) {
             adviceEl.className = 'advice-text advice-wait';
             adviceEl.textContent = 'Enter your cards...';
+            updateLiveDisplay();  // FIXED: Added this to update probabilities
             return;
         }
         
@@ -533,6 +536,7 @@
         else if (action === 'DOUBLE') adviceEl.classList.add('advice-double');
         
         adviceEl.textContent = `${total} vs ${dVal}: ${action}`;
+        updateLiveDisplay();  // FIXED: Added this to update all stats in real-time
     }
 
     function addPlayer() {
